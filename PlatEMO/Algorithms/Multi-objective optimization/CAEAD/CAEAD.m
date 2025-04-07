@@ -2,6 +2,7 @@ classdef CAEAD < ALGORITHM
 % <multi> <real/integer/label/binary/permutation> <constrained>
 % Dual-population evolutionary algorithm based on alternative evolution and degeneration
 % type --- 1 --- Type of operator (1. DE 2. GA)
+%evaluation --- 1 ---final population of EP
 
 %------------------------------- Reference --------------------------------
 % J. Zou, R. Sun, S. Yang, and J. Zheng, A dual-population algorithm based
@@ -18,7 +19,7 @@ classdef CAEAD < ALGORITHM
 
    methods
        function main(Algorithm,Problem)
-           type = Algorithm.ParameterSet(1);
+           [type,evaluation] = Algorithm.ParameterSet(1,1);
            
            %% Generate random population
            Population1 = Problem.Initialization();
@@ -34,7 +35,7 @@ classdef CAEAD < ALGORITHM
            max_ep           = 0;
            gen              = 1;
            stage            = false;
-           
+           EP = updateEP2([Population1,Population2]);
            %% Optimization
            while Algorithm.NotTerminated(Population1)
                pop_cons2      = Population2.cons;
@@ -53,6 +54,7 @@ classdef CAEAD < ALGORITHM
                    Offspring1  = OperatorGAhalf(Problem,Population1(MatingPool1));
                    Offspring2  = OperatorGAhalf(Problem,Population2(MatingPool2));
                end
+               EP = updateEP2([EP,Offspring1,Offspring2]);
                [FrontNo2,~] = NDSort(Population2.objs,size(Population2.objs,1));
                NC2 = size(find(FrontNo2==1),2);
                if gen ~= 1
@@ -82,6 +84,15 @@ classdef CAEAD < ALGORITHM
                [Population1,Fitness1] = EnvironmentalSelection([Population1,Offspring1,Offspring2,Offspring3],Problem.N,true,0);
                [Population2,Fitness2] = EnvironmentalSelection([Population2,Offspring2],Problem.N,false,epsilon_k);
                gen = gen+1;
+               % Output the non-dominated and feasible solutions.
+                if Problem.FE >= Problem.maxFE
+                    if evaluation == 2
+                        %Population1 = EP;
+                        %Population2 = EP;
+                        Population1 = archive(Population1,Problem.N);
+                        Population2 = archive(Population2,Problem.N);
+                    end
+                end
            end
        end
    end

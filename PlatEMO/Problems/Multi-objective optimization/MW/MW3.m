@@ -47,6 +47,7 @@ classdef MW3 < PROBLEM
                 invalid = (0.85-R(:,1)-R(:,2)+0.3*sin(0.75*pi*sqrt(2)*(R(:,2)-R(:,1))).^2) > 0;
             end
         end
+        
         %% Generate the feasible region
         function R = GetPF(obj)
             [x,y] = meshgrid(linspace(0,1,400),linspace(0,1.5,400));

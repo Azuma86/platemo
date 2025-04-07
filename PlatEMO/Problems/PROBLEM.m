@@ -17,6 +17,7 @@ classdef PROBLEM < handle & matlab.mixin.Heterogeneous
 %   optimum         <matrix>    optimal objective values of the problem
 %   PF              <matrix>    image of the Pareto front
 %   parameter       <any>       other parameters of the problem
+%   number          <scalar>    problem number
 %
 % PROBLEM methods:
 %   PROBLEM         <protected> the constructor setting all the properties specified by user
@@ -51,6 +52,7 @@ classdef PROBLEM < handle & matlab.mixin.Heterogeneous
     properties(SetAccess = protected)
         M;                    	% Number of objectives
         D;                     	% Number of decision variables
+        number;
         maxRuntime = inf;      	% maximum runtime (in second)
         encoding   = 1;        	% Encoding scheme of each decision variable (1.real 2.integer 3.label 4.binary 5.permutation)
         lower      = 0;     	% Lower bound of each decision variable

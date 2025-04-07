@@ -3,6 +3,7 @@ classdef PPS < ALGORITHM
 % Push and pull search algorithm
 % delta --- 0.9 --- The probability of choosing parents locally
 % nr    ---   2 --- Maximum number of solutions replaced by each offspring
+%evaluation --- 1 ---final population of EP
 
 %------------------------------- Reference --------------------------------
 % Z. Fan, W. Li, X. Cai, H. Li, C. Wei, Q. Zhang, K. Deb, and E. Goodman,
@@ -22,7 +23,7 @@ classdef PPS < ALGORITHM
     methods
         function main(Algorithm,Problem)
             %% Parameter setting
-            [delta,nr] = Algorithm.ParameterSet(0.9,2);
+            [delta,nr,evaluation] = Algorithm.ParameterSet(0.9,2,1);
 
             %% Generate the weight vectors
             [W,Problem.N] = UniformPoint(Problem.N,Problem.M);
@@ -51,7 +52,8 @@ classdef PPS < ALGORITHM
             ideal_points     = zeros(ceil(Problem.maxFE/Problem.N),Problem.M);
             nadir_points     = zeros(ceil(Problem.maxFE/Problem.N),Problem.M);
             arch             = archive(Population,Problem.N);
-
+            EP = updateEP2(Population);
+            
             %% Optimization
             while Algorithm.NotTerminated(Population)
                 gen        = ceil(Problem.FE/Problem.N);
@@ -80,7 +82,7 @@ classdef PPS < ALGORITHM
                 else
                     epsilon_k = 0;
                 end
-
+                Off(Problem.N) = SOLUTION;
                 % For each solution
                 for i = 1 : Problem.N
                     % Choose the parents
@@ -92,10 +94,10 @@ classdef PPS < ALGORITHM
 
                     % Generate an offspring
                     Offspring = OperatorDE(Problem,Population(i),Population(P(1)),Population(P(2)));
-
+                    Off(i) = Offspring;
                     % Update the ideal point
                     Z = min(Z,Offspring.obj);
-
+                    
                     g_old = max(abs(Population(P).objs-repmat(Z,length(P),1)).*W(P,:),[],2);
                     g_new = max(repmat(abs(Offspring.obj-Z),length(P),1).*W(P,:),[],2);
                     cv_old = overall_cv(Population(P).cons);
@@ -107,11 +109,15 @@ classdef PPS < ALGORITHM
                         Population(P(find(((g_old >= g_new) & (((cv_old <= epsilon_k) & (cv_new <= epsilon_k)) | (cv_old == cv_new)) | (cv_new < cv_old) ), nr))) = Offspring;
                     end
                 end
-
                 % Output the non-dominated and feasible solutions.
+                EP = updateEP2([EP,Off]);
                 arch = archive([arch,Population],Problem.N);
                 if Problem.FE >= Problem.maxFE
-                    Population = arch;
+                    if evaluation == 2
+                        Population = archive(Population,Problem.N);
+                    else
+                        Population = arch;
+                    end
                 end
             end
         end

@@ -2,6 +2,8 @@ classdef C3M < ALGORITHM
 % <multi> <real/integer/label/binary/permutation> <constrained>
 % Constraint, multiobjective, multi-stage, multi-constraint evolutionary algorithm
 % type --- 1 --- Type of operator (1. DE 2. GA)
+%evaluation --- 1 ---final population of EP
+
 
 %------------------------------- Reference --------------------------------
 % R. Sun, J. Zou, Y. Liu, S. Yang, and J. Zheng, A multi-stage algorithm
@@ -20,7 +22,7 @@ classdef C3M < ALGORITHM
 
     methods
         function main(Algorithm,Problem)
-            type = Algorithm.ParameterSet(1);
+            [type,evaluation] = Algorithm.ParameterSet(1,1);
             processcon = 0;
             Population = Problem.Initialization();
             totalcon = size(Population(1,1).con,2);
@@ -42,7 +44,7 @@ classdef C3M < ALGORITHM
             seq = [];
             index = 1;
             processed = [];
-            
+            EP = updateEP2(Population);
             %% Optimization
             while Algorithm.NotTerminated(Population)
                 % Reinitlize
@@ -74,7 +76,7 @@ classdef C3M < ALGORITHM
                     MatingPool = TournamentSelection(2,Problem.N,Fitness);
                     Offspring  = OperatorGA(Problem,Population(MatingPool));
                 end
-
+                EP = updateEP2([EP,Offspring]);
                 % EnvironmentalSelection
                 if flag
                     for i = 1:totalcon
@@ -141,6 +143,14 @@ classdef C3M < ALGORITHM
                     arch = archive([arch,Population,Offspring],Problem.N);
                 end
                 gen = gen+1;
+                
+                % Output the non-dominated and feasible solutions.
+                if Problem.FE >= Problem.maxFE
+                    if evaluation == 2
+                        %Population = EP;
+                        Population = archive(Population,Problem.N);
+                    end
+                end
             end
         end
     end

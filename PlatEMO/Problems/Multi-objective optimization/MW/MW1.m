@@ -44,6 +44,8 @@ classdef MW1 < PROBLEM
             c = 1 - R(:,1) - R(:,2) + 0.5*sin(2*pi*l).^8;
             R(c<0,:) = [];
         end
+
+        
         %% Generate the feasible region
         function R = GetPF(obj)
             [x,y] = meshgrid(linspace(0,1,400),linspace(0,1.5,400));

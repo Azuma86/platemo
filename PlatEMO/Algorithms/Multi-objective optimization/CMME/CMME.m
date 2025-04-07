@@ -1,6 +1,7 @@
 classdef CMME < ALGORITHM
 % <many> <real/integer/label/binary/permutation> <constrained>
 % Constrained many-objective evolutionary algorithm with enhanced mating and environmental selections
+%evaluation --- 1 ---final population of EP
 
 %------------------------------- Reference --------------------------------
 % F. Ming, W. Gong, L. Wang, and L. Gao, A constrained many-objective
@@ -25,7 +26,7 @@ classdef CMME < ALGORITHM
 
             %% Generate random population
             Population = Problem.Initialization();
-
+            EP = updateEP2(Population);
             %% Optimization
             while Algorithm.NotTerminated(Population)
                 density    = DensityEstimate(Population.objs,W);
@@ -33,6 +34,13 @@ classdef CMME < ALGORITHM
                 MatingPool = TournamentSelection(2,Problem.N,Fitness,density);
                 Offspring  = OperatorGA(Problem,Population(MatingPool));
                 Population = EnvironmentalSelection([Population,Offspring],W,Problem.N);
+                EP = updateEP2([EP,Offspring]);
+                % Output the non-dominated and feasible solutions.
+                if Problem.FE >= Problem.maxFE
+                    if evaluation == 2
+                        Population = EP;
+                    end
+                end
             end
         end
     end

@@ -1,6 +1,7 @@
 classdef CTSEA < ALGORITHM
 % <multi/many> <real/integer/label/binary/permutation> <constrained>
 % Constrained two-stage evolutionary algorithm
+%evaluation --- 1 ---final population of EP
 
 %------------------------------- Reference --------------------------------
 % F. Ming, W. Gong, H. Zhen, S. Li, L. Wang, and Z. Liao, A simple
@@ -20,12 +21,14 @@ classdef CTSEA < ALGORITHM
     methods
         function main(Algorithm,Problem)
             %% Generate the sampling points and random population
+            evaluation = Algorithm.ParameterSet(1);
             Population = Problem.Initialization();
             W = UniformPoint(Problem.N,Problem.M);
             [ARMOEA_Archive,RefPoint,Range] = UpdateRefPoint(Population.objs,W,[]);
             CV = sum(max(0,Population.cons),2);
             Archive = Population(CV==0);
             stage_conver = 0;
+            EP = updateEP2(Population);
             
             %% Optimization
             while Algorithm.NotTerminated(Population)
@@ -48,6 +51,13 @@ classdef CTSEA < ALGORITHM
                     MatingPool = MatingSelection2(Population,Archive,Problem.N);
                     Offspring = OperatorGA(Problem,MatingPool);
                     Population = EnvironmentalSelection2([Population,Offspring],Problem.N);
+                end
+                EP = updateEP2([EP,Offspring]);
+                % Output the non-dominated and feasible solutions.
+                if Problem.FE >= Problem.maxFE
+                    if evaluation == 2
+                        Population = EP;
+                    end
                 end
             end
         end

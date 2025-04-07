@@ -1,6 +1,8 @@
 classdef IMTCMO < ALGORITHM
 % <multi> <real/integer/label/binary/permutation> <constrained>
 % Improved evolutionary multitasking-based CMOEA
+%evaluation --- 1 ---final population of EP
+
 
 %------------------------------- Reference --------------------------------
 % K. Qiao, J. Liang, K. Yu, C. Yue, H. Lin, D. Zhang, and B. Qu,
@@ -21,6 +23,7 @@ classdef IMTCMO < ALGORITHM
     methods
         function main(Algorithm,Problem)
             %% Generate random population
+            evaluation = Algorithm.ParameterSet(1);
             Population1 = Problem.Initialization();
             Fitness1    = CalFitness(Population1.objs,Population1.cons);
             Zmin1       = min(Population1.objs,[],1);
@@ -36,7 +39,7 @@ classdef IMTCMO < ALGORITHM
                 VAR0 = 1;
             end
             X=0;
-            
+            EP = updateEP2([Population1,Population2]);
             %% Optimization
             while Algorithm.NotTerminated(Population1)
                 %% Udate the epsilon value
@@ -62,6 +65,13 @@ classdef IMTCMO < ALGORITHM
                 [Population2,Fitness2] = Auxiliray_task_EnvironmentalSelection([Population2,Offspring2,Offspring1], Problem.N, VAR);
 
                 X=X+1/(Problem.maxFE/Problem.N);
+                EP = updateEP2([EP,Offspring1,Offspring2]);
+                % Output the non-dominated and feasible solutions.
+                if Problem.FE >= Problem.maxFE
+                    if evaluation == 2
+                        Population1 = EP;
+                    end
+                end
             end
         end
     end

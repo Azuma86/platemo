@@ -33,7 +33,6 @@ classdef MOEAD < ALGORITHM
             %% Generate random population
             Population = Problem.Initialization();
             Z = min(Population.objs,[],1);
-
             %% Optimization
             while Algorithm.NotTerminated(Population)
                 % For each solution

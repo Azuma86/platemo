@@ -24,6 +24,7 @@ classdef RWMOP39 < PROBLEM
             obj.lower    = [-ones(1,24),zeros(1,4)];
             obj.upper    = ones(1,28);
             obj.encoding = ones(1,obj.D);
+            obj.number = 39;
         end
         %% Evaluate multiple solutions
         function Population = Evaluation(obj,varargin)

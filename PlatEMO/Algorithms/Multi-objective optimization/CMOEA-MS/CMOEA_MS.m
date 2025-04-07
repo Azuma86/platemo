@@ -3,6 +3,7 @@ classdef CMOEA_MS < ALGORITHM
 % Constrained multiobjective evolutionary algorithm with multiple stages
 % type   ---   1 --- Type of operator (1. GA 2. DE)
 % lambda --- 0.5 --- Parameter for determining the current stage
+%evaluation --- 1 ---final population of EP
 
 %------------------------------- Reference --------------------------------
 % Y. Tian, Y. Zhang, Y. Su, X. Zhang, K. C. Tan, and Y. Jin, Balancing
@@ -21,12 +22,12 @@ classdef CMOEA_MS < ALGORITHM
     methods
         function main(Algorithm,Problem)
             %% Parameter setting
-        	[type,lambda] = Algorithm.ParameterSet(1,0.5);
+        	[type,lambda,evaluation] = Algorithm.ParameterSet(1,0.5,1);
 
            %% Generate random population
             Population = Problem.Initialization();
             Fitness    = CalFitness([CalSDE(Population.objs)',CalCV(Population.cons)]);
-
+            EP = updateEP2(Population);
             %% Optimization
             while Algorithm.NotTerminated(Population)
                 if type == 1
@@ -37,6 +38,7 @@ classdef CMOEA_MS < ALGORITHM
                     Mat2 = TournamentSelection(2,Problem.N,Fitness);
                     Offspring = OperatorDE(Problem,Population,Population(Mat1),Population(Mat2));
                 end
+                EP = updateEP2([EP,Offspring]);
                 Q  = [Population,Offspring];
                 CV = CalCV(Q.cons);
                 if mean(CV<=0) > lambda && Problem.FE >= 0.1*Problem.maxFE
@@ -45,6 +47,13 @@ classdef CMOEA_MS < ALGORITHM
                     Fitness = CalFitness([CalSDE(Q.objs)',CV]);
                 end
                 [Population,Fitness] = EnvironmentalSelection(Fitness,Q,Problem.N);
+                % Output the non-dominated and feasible solutions.
+                if Problem.FE >= Problem.maxFE
+                    if evaluation == 2
+                        %Population = EP;
+                        Population = archive(Population,Problem.N);
+                    end
+                end
             end
         end
     end

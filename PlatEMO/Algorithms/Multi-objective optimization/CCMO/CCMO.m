@@ -2,6 +2,7 @@ classdef CCMO < ALGORITHM
 % <multi> <real/integer/label/binary/permutation> <constrained>
 % Coevolutionary constrained multi-objective optimization framework
 % type --- 1 --- Type of operator (1. GA 2. DE)
+%evaluation --- 1 ---final population of EP
 
 %------------------------------- Reference --------------------------------
 % Y. Tian, T. Zhang, J. Xiao, X. Zhang, and Y. Jin, A coevolutionary
@@ -19,14 +20,14 @@ classdef CCMO < ALGORITHM
     methods
         function main(Algorithm,Problem)
             %% Parameter setting
-            type = Algorithm.ParameterSet(1);
+            [type,evaluation] = Algorithm.ParameterSet(1,1);
 
             %% Generate random population
             Population1 = Problem.Initialization();
             Population2 = Problem.Initialization();
             Fitness1    = CalFitness(Population1.objs,Population1.cons);
             Fitness2    = CalFitness(Population2.objs);
-
+            arch = updateEP2([Population1,Population2]);
             %% Optimization
             while Algorithm.NotTerminated(Population1)
                 if type == 1
@@ -40,8 +41,19 @@ classdef CCMO < ALGORITHM
                     Offspring1  = OperatorDE(Problem,Population1,Population1(MatingPool1(1:end/2)),Population1(MatingPool1(end/2+1:end)));
                     Offspring2  = OperatorDE(Problem,Population2,Population2(MatingPool2(1:end/2)),Population2(MatingPool2(end/2+1:end)));
                 end
+                arch = updateEP2([arch,Offspring1,Offspring2]);
                 [Population1,Fitness1] = EnvironmentalSelection([Population1,Offspring1,Offspring2],Problem.N,true);
                 [Population2,Fitness2] = EnvironmentalSelection([Population2,Offspring1,Offspring2],Problem.N,false);
+                
+                % Output the non-dominated and feasible solutions.
+                if Problem.FE >= Problem.maxFE
+                    if evaluation == 2
+                        %Population1 = arch;
+                        %Population2 = arch;
+                        Population1 = archive(Population1,Problem.N);
+                        Population2 = archive(Population2,Problem.N);
+                    end
+                end
             end
         end
     end

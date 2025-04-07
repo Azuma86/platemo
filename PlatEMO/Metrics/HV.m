@@ -17,12 +17,16 @@ function score = HV(Population,optimum)
 
     PopObj = Population.best.objs;
     if size(PopObj,2) ~= size(optimum,2)
-        score = nan;
+        %score = nan;
+        score = 0;
     else
+        m2 = 1.01010101;
+        m3 = 1.08333333;
+        m5 = 1.25;
         [N,M]  = size(PopObj);
-        fmin   = min(min(PopObj,[],1),zeros(1,M));
         fmax   = max(optimum,[],1);
-        PopObj = (PopObj-repmat(fmin,N,1))./repmat((fmax-fmin)*1.1,N,1);
+        fmin   = min(optimum,[],1);
+        PopObj = (PopObj-repmat(fmin,N,1))./repmat((fmax-fmin)*m2,N,1);
         PopObj(any(PopObj>1,2),:) = [];
         RefPoint = ones(1,M);
         if isempty(PopObj)

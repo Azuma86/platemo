@@ -37,11 +37,14 @@ classdef MW2 < PROBLEM
             Population  = SOLUTION(X,PopObj,PopCon,varargin{2:end});
             obj.FE      = obj.FE + length(Population);
         end
+
         %% Generate points on the Pareto front
         function R = GetOptimum(obj,N)
             R(:,1) = (0:1/(N-1):1)';
             R(:,2) = 1 - R(:,1);
         end
+
+        
         %% Generate the feasible region
         function R = GetPF(obj)
             [x,y] = meshgrid(linspace(0,1,400),linspace(0,1.5,400));

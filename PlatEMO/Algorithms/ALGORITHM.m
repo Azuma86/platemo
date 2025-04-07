@@ -33,7 +33,7 @@ classdef ALGORITHM < handle & matlab.mixin.Heterogeneous
 
     properties(SetAccess = protected)
         parameter = {};                 % Parameters of the algorithm
-        save      = -10;            	% Number of populations saved in an execution
+        save      = 10;            	% Number of populations saved in an execution
         run       = [];                	% Current execution number
         metName   = {};                 % Names of metrics to calculate
         outputFcn = @DefaultOutput;     % Function called after each generation
@@ -41,6 +41,10 @@ classdef ALGORITHM < handle & matlab.mixin.Heterogeneous
         result;                         % Populations saved in current execution
         metric;                         % Metric values of current populations
         starttime;                      % Used for runtime recording
+        EP;
+        sca;
+        con;
+
     end
     methods(Access = protected)
         function obj = ALGORITHM(varargin)
@@ -193,9 +197,15 @@ function DefaultOutput(Algorithm,Problem)
             end
             result = Algorithm.result;
             metric = Algorithm.metric;
+            EP = ALgorithm.EP;
+            sca = ALgorithm.sca;
+            con = ALgorithm.con;
             folder = fullfile('Data',class(Algorithm));
             [~,~]  = mkdir(folder);
             file   = fullfile(folder,sprintf('%s_%s_M%d_D%d_',class(Algorithm),class(Problem),Problem.M,Problem.D));
+            file2   = fullfile(folder,sprintf('%s_%s_EP_M%d_D%d_',class(Algorithm),class(Problem),Problem.M,Problem.D));
+            file3   = fullfile(folder,sprintf('%s_%s_sca_M%d_D%d_',class(Algorithm),class(Problem),Problem.M,Problem.D));
+            file4   = fullfile(folder,sprintf('%s_%s_con_M%d_D%d_',class(Algorithm),class(Problem),Problem.M,Problem.D));
             if isempty(Algorithm.run) 
                 Algorithm.run = 1;
                 while exist([file,num2str(Algorithm.run),'.mat'],'file') == 2
@@ -203,6 +213,9 @@ function DefaultOutput(Algorithm,Problem)
                 end
             end
             save([file,num2str(Algorithm.run),'.mat'],'result','metric');
+            save([file2,num2str(Algorithm.run),'.mat'],'EP');
+            save([file3,num2str(Algorithm.run),'.mat'],'sca');
+            save([file4,num2str(Algorithm.run),'.mat'],'con');
         end
     end
 end

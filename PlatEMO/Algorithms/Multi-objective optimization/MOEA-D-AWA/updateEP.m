@@ -14,7 +14,6 @@ function EP = updateEP(EP,Offsprings,nEP)
     EP = [EP,Offsprings];
     EP = EP(NDSort(EP.objs,1)==1);
     [N,M] = size(EP.objs);
-    
     %% Delete the overcrowded solutions
     Dis = pdist2(EP.objs,EP.objs);
     Dis(logical(eye(length(Dis)))) = inf;

@@ -1,6 +1,7 @@
 classdef MCCMO< ALGORITHM
 % <multi> <real/integer/label/binary/permutation> <constrained>
 % Multi-population coevolutionary constrained multi-objective optimization
+% evaluation --- 1 ---final population of EP
 
 %------------------------------- Reference --------------------------------
 % J. Zou, R. Sun, Y. Liu, Y. Hu, S. Yang, J. Zheng, and K. Li, A
@@ -18,6 +19,7 @@ classdef MCCMO< ALGORITHM
 
     methods
         function main(Algorithm,Problem)
+            evaluation = Algorithm.ParameterSet(1);
             Pop0 = Problem.Initialization();
             Fit0 = CalFitness(Pop0.objs);
             totalcon = size(Pop0(1,1).con,2);
@@ -64,7 +66,7 @@ classdef MCCMO< ALGORITHM
             Feas = [];
             IGDV = [];
             dUPF = 0;
-                        
+            EP = updateEP2(arch);   
             %% Optimization
             while Algorithm.NotTerminated(arch)
                 Off = [];

@@ -52,7 +52,6 @@ function Offspring = OperatorDE(Problem,Parent1,Parent2,Parent3,Parameter)
     Site = rand(N,D) < CR;
     Offspring       = Parent1;
     Offspring(Site) = Offspring(Site) + F*(Parent2(Site)-Parent3(Site));
-
     %% Polynomial mutation
     Lower = repmat(Problem.lower,N,1);
     Upper = repmat(Problem.upper,N,1);

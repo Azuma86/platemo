@@ -36,12 +36,15 @@ classdef MW4 < PROBLEM
             obj.FE      = obj.FE + length(Population);
         end
         %% Generate points on the Pareto front
+
         function R = GetOptimum(obj,N)
             R = UniformPoint(N,obj.M);
             l = R(:,end) - sum(R(:,1:end-1),2);
             c = (1+0.4*sin(2.5*pi*l).^8) - sum(R,2);
             R(c<0,:) = [];
         end
+        
+        
         %% Generate the feasible region
         function R = GetPF(obj)
             if obj.M == 2

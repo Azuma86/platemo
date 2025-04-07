@@ -275,6 +275,8 @@ classdef module_exp < handle
                 obj.app.buttonC(1).Text     = 'Pause';
                 obj.app.buttonC(2).Enable   = 'on';
                 drawnow('limitrate');
+                baseseed = 150;
+                %baseseed = 123;
                 % Perform the experiment
                 for p = 1 : length(PRO)
                     for a = 1 : length(ALG)
@@ -286,6 +288,7 @@ classdef module_exp < handle
                         if ~isempty(runIndex) && ~isParallel
                             try
                                 for r = runIndex
+                                    rng(baseseed+r);
                                     ALG(a).Solve(PRO(p));
                                     obj.ResultSave(p,a,r,ALG(a).result,ALG(a).metric);
                                     obj.ResultLoad(p,a,r);
@@ -302,7 +305,7 @@ classdef module_exp < handle
                         % Run algorithms in parallel
                         elseif ~isempty(runIndex)
                             try
-                                Future = arrayfun(@(s)parfeval(@parallelFcn,2,ALG(a),PRO(p)),runIndex);
+                                Future = arrayfun(@(s)parfeval(@parallelFcn, 2, ALG(a), PRO(p), baseseed + s), runIndex);
                                 while ~all([Future.Read])
                                     drawnow('limitrate');
                                     if strcmp(obj.app.buttonC(2).Enable,'off')
@@ -640,10 +643,11 @@ classdef module_exp < handle
 end
 
 %% Function for parallelization
-function [result,metric] = parallelFcn(Algorithm,Problem)
-    Algorithm.Solve(Problem);
-    result = Algorithm.result;
-    metric = Algorithm.metric;
+function [result, metric] = parallelFcn(ALG, PRO, seed)
+    rng(seed); % 同じシード値を各ワーカーで設定
+    ALG.Solve(PRO); % アルゴリズムの実行
+    result = ALG.result; % 結果を返す
+    metric = ALG.metric; % メトリックを返す
 end
 
 %% Save the table to Excel

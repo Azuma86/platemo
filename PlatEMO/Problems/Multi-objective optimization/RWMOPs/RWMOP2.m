@@ -24,6 +24,7 @@ classdef RWMOP2 < PROBLEM
             obj.lower    = [0.05,0.2,0.2,0.35,3];
             obj.upper    = [0.5,0.5,0.6,0.5,6];
             obj.encoding = ones(1,obj.D);
+            obj.number = 2;
         end
         %% Evaluate multiple solutions
         function Population = Evaluation(obj,varargin)
@@ -52,7 +53,9 @@ classdef RWMOP2 < PROBLEM
         end 
          %% Generate a point for hypervolume calculation
         function R = GetOptimum(obj,~)
-            R = [-1.2746083e-03   3.1825489e+02];
+            %R = [-1.2746083e-03   3.1825489e+02];
+            %R = [-0.044941 210.000000;-0.001275 226.799943];
+            R = [-0.044941 210.000000;-0.001275 226.799954];
         end
     end
 end
