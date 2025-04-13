@@ -1,10 +1,9 @@
-function neighbor_search(solutions,pro)
+function neighbor_search(solutions,pro,k,numStart)
    
-    k        = 3;      % k近傍
-    numStart = 1000;     % ランダムに選ぶ開始点数    
+       
 
-    N = size(solutions.dec,1);
-    D = size(solutions.dec,2);
+    N = size(solutions.decs,1);
+    D = size(solutions.decs,2);
     C = size(solutions.cons,2);
     
     % 制約違反総量
@@ -13,11 +12,13 @@ function neighbor_search(solutions,pro)
     % 近傍探索用の k-d-tree モデルを作成
     % NSMethod='kdtree' はデフォルトで2～10次元くらいの時に有効
     % Dが大きいと性能に注意
-    Mdl = createns(solutions.dec,'NSMethod','kdtree');
+    Mdl = createns(solutions.decs,'NSMethod','kdtree');
     
+    initN    = size(solutions.initDecs,1);
     % 出発点をランダムに選択
     rng(0,'twister');
-    startIDs = randperm(N, min(numStart,N));
+    %startIDs = randperm(N, min(numStart,N));
+    startIDs = randperm(initN, min(numStart, initN));
     
     % ========== 結果格納用 (テーブルに出す) ===========
     % Python 側での可視化に合わせた列名を用意
@@ -30,9 +31,18 @@ function neighbor_search(solutions,pro)
     
     % ========== 局所探索 (各開始点で繰り返し) ===========
     for s = 1:length(startIDs)
-        currentID  = startIDs(s);   % 現在の点のインデックス
+        %
+        initID   = startIDs(s);
+        decStart = solutions.initDecs(initID,:);
+        
+        % 全解集合 decAll の中で該当解を探してインデックスを取得
+        idxInAll = find(ismember(solutions.decs, decStart, 'rows'), 1);
+        %}
+        % ここから近傍探索開始
+        %currentID  = startIDs(s);   % 現在の点のインデックス
+        currentID  = idxInAll;
         cvCurrent  = cvAll(currentID);
-        decCurrent = solutions.dec(currentID,:);
+        decCurrent = solutions.decs(currentID,:);
         consCurrent= solutions.cons(currentID,:);
         
         gen = 0;
@@ -78,7 +88,7 @@ function neighbor_search(solutions,pro)
             % 移動
             currentID  = bestID;
             cvCurrent  = cvAll(bestID);
-            decCurrent = solutions.dec(bestID,:);
+            decCurrent = solutions.decs(bestID,:);
             consCurrent= solutions.cons(bestID,:);
             
             gen = gen + 1;
@@ -89,6 +99,6 @@ function neighbor_search(solutions,pro)
     end
     % ========== テーブル化 & CSV 出力 ===========
     T = array2table(allRecords, 'VariableNames', varNames);
-    writetable(T, sprintf('/Users/azumayuki/Documents/LON/data09-20-pre/local_search%s.csv',pro));
+    writetable(T, sprintf('/Users/azumayuki/Documents/LONs/data09-20-pre/local_search%s.csv',pro));
     fprintf('Local search finished. %d records saved.\n', size(T,1));
 end
