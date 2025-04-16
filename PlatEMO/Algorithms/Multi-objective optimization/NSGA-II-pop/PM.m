@@ -17,11 +17,11 @@ classdef PM < ALGORITHM
             PrevPopulation = Population;
             stableCount = zeros(1,N);
             feaGen = zeros(1,N);
-            stableThreshold = 20;
+            stableThreshold = 10;
             child = 10;
 
             % CSVファイルの初期化: 決定変数と目的関数、制約値をカラム分割
-            csvFilename = sprintf('/Users/azumayuki/Documents/LONs/data09-20-pre/RWMOP%d_data.csv',pn);
+            csvFilename = sprintf('/Users/azumayuki/Documents/LON/data09-20-pre/RWMOP%d_data.csv',pn);
             %csvFilename = sprintf(csvFilename,proM,disM);
             objCount = length(Population(1).objs);
             conCount = length(Population(1).cons);

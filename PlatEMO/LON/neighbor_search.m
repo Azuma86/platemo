@@ -1,6 +1,4 @@
 function neighbor_search(solutions,pro,k,numStart)
-   
-       
 
     N = size(solutions.decs,1);
     D = size(solutions.decs,2);

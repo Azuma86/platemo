@@ -8,8 +8,8 @@
     % 例）"RWMOP15" を呼び出す場合は下記のようにevalで文字列生成
     problemIndex = 3;
     N = 100000;
-    filenameX = sprintf('/Users/azumayuki/Documents/LONs/data_LHS/X_RWMOP%d.csv',problemIndex);
-    filenameC = sprintf('/Users/azumayuki/Documents/LONs/data_LHS/Cons_RWMOP%d.csv',problemIndex);
+    filenameX = sprintf('/Users/azumayuki/Library/Mobile Documents/com~apple~CloudDocs/LONs/data_LHS/X_RWMOP%d.csv',problemIndex);
+    filenameC = sprintf('/Users/azumayuki/Library/Mobile Documents/com~apple~CloudDocs/LONs/data_LHS/Cons_RWMOP%d.csv',problemIndex);
     eval(['Problem = RWMOP', num2str(problemIndex), '();']);
     Problem.Setting();  % ここでProblem.lower, Problem.upperなどが決定
 
@@ -30,7 +30,7 @@
     % --- 4) ファイル出力 ---
     % 行列をCSVに書き出し
     % （行列サイズが大きい場合はwritematrixやdlmwriteの方が高速なことも）
-    %writematrix(X, filenameX);
-    %writematrix(Cons, filenameC);
+    writematrix(X, filenameX);
+    writematrix(Cons, filenameC);
 
     %fprintf('Done sampling RWMOP%d: saved %d samples.\n', problemIndex, N);

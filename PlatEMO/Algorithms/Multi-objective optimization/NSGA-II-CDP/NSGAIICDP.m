@@ -16,8 +16,9 @@ classdef NSGAIICDP < ALGORITHM
             % （必要に応じてファイル名や出力形式を変更してください）
             filename = sprintf('/Users/azumayuki/Documents/LONs/feasible_ratio_CV/RWMOP%d_CV.csv', pn);
             filename2 = sprintf('/Users/azumayuki/Documents/LONs/feasible_first_CV/RWMOP%d_CV_first.csv', pn);
-            f = logFeasibleRatio(Population, gen, filename, f, filename2);
+            %f = logFeasibleRatio(Population, gen, filename, f, filename2);
             arch = updateEP2(Population);
+            all = Population;
             %% 2. メインループ
             while Algorithm.NotTerminated(Population)
                 gen = gen + 1;
@@ -28,13 +29,15 @@ classdef NSGAIICDP < ALGORITHM
                 % 2.2 交叉・突然変異
                 Offspring  = OperatorGA(Problem, Population(MatingPool));
                 arch = updateEP2([arch,Offspring]);
+                all = [all,Population];
                 % 2.3 次世代選択（CDPベース）
                 [Population,FrontNo,CrowdDis] = EnvironmentalSelectionCDP([Population,Offspring], Problem.N);
 
-                f = logFeasibleRatio(Population, gen, filename, f, filename2);
+                %f = logFeasibleRatio(Population, gen, filename, f, filename2);
                 if Problem.FE >= Problem.maxFE
                    arch = archive(arch,Problem.N*2);
-                   Population = arch;
+                   %Population = arch;
+                   Population = all;
                 end
             end
         end
@@ -42,10 +45,9 @@ classdef NSGAIICDP < ALGORITHM
 end
 
 function t = logFeasibleRatio(Pop, gen, filename,f ,filename2)
-    CV = arrayfun(@(p) sum(max(0,p.cons)), Pop);
-    feasibleCount = sum(CV == 0);
-    
-    ratio = feasibleCount / length(Pop);
+    CV = sum(max(0,Pop.cons),2);
+    disp(length(find(CV==0))/length(Pop))
+    ratio = length(find(CV==0)) / length(Pop);
     if f == 0
         if ratio > 0
             f = 1;

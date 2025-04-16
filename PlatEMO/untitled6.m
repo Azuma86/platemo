@@ -1,3 +1,3 @@
-t = [5,6,7,1,5,1,7];
-[~, bestIdx] = min(t);
-disp(bestIdx)
+t = [5,6,7;6,5,7;5,6,7];
+t = unique(t,"rows");
+disp(t)
